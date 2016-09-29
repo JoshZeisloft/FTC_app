@@ -1,0 +1,6 @@
+package steelserpents.autolibraries;
+
+public enum RobotStates
+{
+    START, TRAVERSE_TOWARD_BEACON, TURN_TO_BEACON, DRIVING_FORWARD, LOOKING_FOR_BEACON, BEACON_FOUND, CENTERED_ON_BEACON
+}
