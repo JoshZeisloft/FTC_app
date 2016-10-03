@@ -13,7 +13,7 @@ import com.qualcomm.robotcore.util.Range;
 import steelserpents.autolibraries.PathSeg;
 import steelserpents.autolibraries.RobotStates;
 
-@Autonomous(name = "BasicAuto33", group = "Autonomous")
+@Autonomous(name = "BasicAuto", group = "Autonomous")
 public class BasicAuto extends OpMode
 {
     DcMotor backl;
@@ -32,20 +32,24 @@ public class BasicAuto extends OpMode
     // Note: this is a dummy path, and is NOT likely to actually work with YOUR robot.
     private static RobotStates robotState;
     final PathSeg[] mBeaconPath = {
-            new PathSeg(  83.0,  83.0, 0.4),
+            new PathSeg(  5.0,  5.0, 0.4),
+            new PathSeg(  5.0,  -5.0, 0.4),
+            new PathSeg(  -5.0,  5.0, 0.4)
     };
 
     private PathSeg[]           mCurrentPath;     // Array to hold current path`
     private int                 mCurrentSeg;      // Index of the current leg in the current path
     private int                 COUNTS_PER_INCH = 135; // Determined by trial and error measurements.
-    private int                 mLeftEncoderTarget;
-    private int                 mRightEncoderTarget;
+    private int                 mFrontLeftEncoderTarget;
+    private int                 mFrontRightEncoderTarget;
+    private int                 mBackLeftEncoderTarget;
+    private int                 mBackRightEncoderTarget;
 
     //DcMotor debris_motor;
-    DcMotorController   driveController;
-    DcMotor             mRightMotor;
-    DcMotor             mLeftMotor;
-    DcMotor             tread_drive;
+//    DcMotorController   driveController;
+//    DcMotor             mRightMotor;
+//    DcMotor             mLeftMotor;
+//    DcMotor             tread_drive;
 
 
 
@@ -104,8 +108,10 @@ public class BasicAuto extends OpMode
     void syncEncoders()
     {
         //	get and set the encoder targets
-        mLeftEncoderTarget = mLeftMotor.getCurrentPosition();
-        mRightEncoderTarget = mRightMotor.getCurrentPosition();
+        mFrontLeftEncoderTarget = frontl.getCurrentPosition();
+        mFrontRightEncoderTarget = frontr.getCurrentPosition();
+        mBackLeftEncoderTarget = backl.getCurrentPosition();
+        mBackRightEncoderTarget = backr.getCurrentPosition();
     }
     //--------------------------------------------------------------------------
     // runToPosition ()
@@ -121,24 +127,46 @@ public class BasicAuto extends OpMode
     //--------------------------------------------------------------------------
     boolean encodersAtZero()
     {
-        return ((Math.abs(getLeftPosition()) < 5) && (Math.abs(getRightPosition()) < 5));
+        return (
+                (Math.abs(getFrontLeftPosition()) < 5) &&
+                (Math.abs(getFrontRightPosition()) < 5) &&
+                (Math.abs(getBackLeftPosition()) < 5) &&
+                (Math.abs(getBackRightPosition()) < 5)
+        );
     }
     //--------------------------------------------------------------------------
     // getLeftPosition ()
     // Return Left Encoder count
     //--------------------------------------------------------------------------
-    int getLeftPosition()
+    int getFrontLeftPosition()
     {
-        return mLeftMotor.getCurrentPosition();
+        return frontl.getCurrentPosition();
+    }
+
+    //--------------------------------------------------------------------------
+    // getLeftPosition ()
+    // Return Left Encoder count
+    //--------------------------------------------------------------------------
+    int getBackLeftPosition()
+    {
+        return backl.getCurrentPosition();
     }
 
     //--------------------------------------------------------------------------
     // getRightPosition ()
     // Return Right Encoder count
     //--------------------------------------------------------------------------
-    int getRightPosition()
+    int getFrontRightPosition()
     {
-        return mRightMotor.getCurrentPosition();
+        return frontr.getCurrentPosition();
+    }
+    //--------------------------------------------------------------------------
+    // getRightPosition ()
+    // Return Right Encoder count
+    //--------------------------------------------------------------------------
+    int getBackRightPosition()
+    {
+        return backr.getCurrentPosition();
     }
     //--------------------------------------------------------------------------
     // setDriveMode ()
@@ -147,11 +175,17 @@ public class BasicAuto extends OpMode
     public void setDriveMode(DcMotor.RunMode mode)
     {
         // Ensure the motors are in the correct mode.
-        if (mLeftMotor.getMode() != mode)
-            mLeftMotor.setMode(mode);
+        if (frontl.getMode() != mode)
+            frontl.setMode(mode);
 
-        if (mRightMotor.getMode() != mode)
-            mRightMotor.setMode(mode);
+        if (frontr.getMode() != mode)
+            frontr.setMode(mode);
+
+        if (backl.getMode() != mode)
+            backl.setMode(mode);
+
+        if (backr.getMode() != mode)
+            backr.setMode(mode);
     }
     //--------------------------------------------------------------------------
     // resetDriveEncoders()
@@ -168,8 +202,10 @@ public class BasicAuto extends OpMode
     //--------------------------------------------------------------------------
     void setEncoderTarget(int leftEncoder, int rightEncoder)
     {
-        mLeftMotor.setTargetPosition(mLeftEncoderTarget = leftEncoder);
-        mRightMotor.setTargetPosition(mRightEncoderTarget = rightEncoder);
+        frontl.setTargetPosition(mFrontLeftEncoderTarget = leftEncoder);
+        frontr.setTargetPosition(mFrontRightEncoderTarget = rightEncoder);
+        backl.setTargetPosition(mBackLeftEncoderTarget = leftEncoder);
+        backr.setTargetPosition(mBackRightEncoderTarget = rightEncoder);
     }
     /*
             Begin the first leg of the path array that is passed in.
@@ -240,8 +276,11 @@ public class BasicAuto extends OpMode
     boolean moveComplete()
     {
         //  return (!mLeftMotor.isBusy() && !mRightMotor.isBusy());
-        return ((Math.abs(getLeftPosition() - mLeftEncoderTarget) < 10) &&
-                (Math.abs(getRightPosition() - mRightEncoderTarget) < 10));
+        return ((Math.abs(getFrontLeftPosition() -  mFrontLeftEncoderTarget ) < 10) &&
+                (Math.abs(getFrontRightPosition() - mFrontRightEncoderTarget) < 10) &&
+                (Math.abs(getBackLeftPosition() -   mBackLeftEncoderTarget  ) < 10) &&
+                (Math.abs(getBackRightPosition() -  mBackRightEncoderTarget ) < 10)
+        );
     }
     //--------------------------------------------------------------------------
     // useConstantSpeed ()
@@ -257,8 +296,10 @@ public class BasicAuto extends OpMode
     //--------------------------------------------------------------------------
     void addEncoderTarget(int leftEncoder, int rightEncoder)
     {
-        mLeftMotor.setTargetPosition(mLeftEncoderTarget += leftEncoder);
-        mRightMotor.setTargetPosition(mRightEncoderTarget += rightEncoder);
+        frontl.setTargetPosition(mFrontLeftEncoderTarget += leftEncoder);
+        frontr.setTargetPosition(mFrontRightEncoderTarget += rightEncoder);
+        backl.setTargetPosition(mBackLeftEncoderTarget += leftEncoder);
+        backr.setTargetPosition(mBackRightEncoderTarget += rightEncoder);
     }
 
     //--------------------------------------------------------------------------
@@ -274,7 +315,9 @@ public class BasicAuto extends OpMode
     //--------------------------------------------------------------------------
     void setDrivePower(double leftPower, double rightPower)
     {
-        mLeftMotor.setPower(Range.clip(leftPower, -1, 1));
-        mRightMotor.setPower(Range.clip(rightPower, -1, 1));
+        frontl.setPower(Range.clip(leftPower, -1, 1));
+        frontr.setPower(Range.clip(rightPower, -1, 1));
+        backl.setPower(Range.clip(leftPower, -1, 1));
+        backr.setPower(Range.clip(rightPower, -1, 1));
     }
 }

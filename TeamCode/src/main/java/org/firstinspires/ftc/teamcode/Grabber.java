@@ -30,16 +30,23 @@ public class Grabber extends OpMode
     @Override
     public void loop()
     {
-       if(gamepad1.x)
-       {
-           left.setPosition(1);
-           right.setPosition(0);
-       }
-       else
-       {
-           left.setPosition(0);
-           right.setPosition(1);
-       }
+        if(gamepad1.x)
+        {
+            left.setPosition(1);
+        }
+        else
+        {
+            left.setPosition(0);
+        }
+
+        if(gamepad1.b)
+        {
+            right.setPosition(0);
+        }
+        else
+        {
+            right.setPosition(1);
+        }
     }
     @Override
     public void stop()
