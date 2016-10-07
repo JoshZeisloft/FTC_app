@@ -119,10 +119,10 @@ public class SkateboardTeleOp extends OpMode
 
 
         if (numOfMovements != 0) {
-            frontLeftPower /= numOfMovements;
+            frontLeftPower  /= numOfMovements;
             frontRightPower /= numOfMovements;
-            backLeftPower /= numOfMovements;
-            backRightPower /= numOfMovements;
+            backLeftPower   /= numOfMovements;
+            backRightPower  /= numOfMovements;
         }
 
         frontLeftPower  *= speedMultiplier;
